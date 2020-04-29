@@ -1,0 +1,26 @@
+# Set an admin login and password for your database
+export ADMINLOGIN= configseg
+export PASSWORD= Aj04102014
+export SERVERNAME=server$RANDOM
+export RESOURCEGROUP=learn-374cd15b-a144-43ac-bcb9-ebf2e4ed7adf
+export LOCATION=$(az group show --name $RESOURCEGROUP | jq -r '.location')
+
+#CRIAÇÃO DO SSQL SERVER
+az sql server create \
+    --name $SERVERNAME \
+    --resource-group $RESOURCEGROUP \
+    --location $LOCATION \
+    --admin-user configseg \
+    --admin-password Aj04102014
+	
+#CRIAÇÃO DO BANCO DE DADOS
+az sql db create --resource-group $RESOURCEGROUP \
+    --server $SERVERNAME \
+    --name marketplaceDb \
+    --sample-name AdventureWorksLT \
+    --service-objective Basic
+
+#OBTENÇÃO DA CADEIA DE CONEXÃO
+az sql db show-connection-string --client sqlcmd --name marketplaceDb --server $SERVERNAME | jq -r
+--> #OUTPUT
+	sqlcmd -S tcp:server4760.database.windows.net,1433 -d marketplaceDb -U configseg -P Aj04102014 -N -l 30
