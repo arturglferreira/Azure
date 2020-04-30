@@ -1,0 +1,68 @@
+#CRIAR BANCO DE DADOS SQL DO AZURE
+  # Set an admin login and password for your database
+  export ADMINLOGIN= artur
+  export PASSWORD= Sqlteste1
+  # Set the logical SQL server name. We'll add a random string as it needs to be globally unique.
+  export SERVERNAME=server$RANDOM
+  export RESOURCEGROUP=learn-d082fad0-7286-4679-a912-088863b798c1
+  # Set the location, we'll pull the location from our resource group.
+  export LOCATION=$(az group show --name $RESOURCEGROUP | jq -r '.location')
+
+      #CRIAR UM SERVIDOR LÓGICO NO DB SQL AZURE
+      az sql server create \
+          --name $SERVERNAME \
+          --resource-group $RESOURCEGROUP \
+          --location $LOCATION \
+          --admin-user artur \
+          --admin-password Sqlteste1
+
+      #CRIAR UM BANCO DE DADOS CHAMADO "marketplaceDb",
+      az sql db create --resource-group $RESOURCEGROUP \
+          --server $SERVERNAME \
+          --name marketplaceDb \
+          --sample-name AdventureWorksLT \
+          --service-objective Basic
+          
+     #OBTER A CADEIA DE CONEXÃO PARA ESTE BANCO DE DADOS
+     az sql db show-connection-string --client sqlcmd --name marketplaceDb --server $SERVERNAME | jq -r
+          #OUTPUT: sqlcmd -S tcp:server29429.database.windows.net,1433 -d marketplaceDb -U artur -P Sqlteste1 -N -l 30
+            ****SE O OUTPUT TIVER ERRO DE ACESSO POR CONTA DO IP, É NECESSÁRIO AUTORIZÁ-LO VIA PAINEL
+*******************************************************************************************************************************
+#CRIAR E CONFIGURAR VM LINUX
+az vm create \
+  --resource-group $RESOURCEGROUP \
+  --name appServer \
+  --image UbuntuLTS \
+  --size Standard_DS2_v2 \
+  --generate-ssh-keys
+  
+      --> OUTPUT****************************************
+              {- Finished ..
+          "fqdns": "",
+          "id": "/subscriptions/e437e6a0-6238-4683-8a1a-3e7ef15124ee/resourceGroups/learn-d082fad0-7286-4679-a912-088863b798c1/providers/Microsoft.Compute/virtualMachines/appServer",
+          "location": "westus",
+          "macAddress": "00-0D-3A-33-95-7C",
+          "powerState": "VM running",
+          "privateIpAddress": "10.0.0.4",
+          "publicIpAddress": "13.64.145.203",
+          "resourceGroup": "learn-d082fad0-7286-4679-a912-088863b798c1",
+          "zones": ""
+           }
+           
+ #SE CONECTAR A VM POR MEIO DO ENDEREÇO DE IP
+  SSH publicIpAddress 
+ #INSTALAR FERRAMENTAS MSSQL NA VM DO LINUX
+  echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bash_profile
+  echo 'export PATH="$PATH:/opt/mssql-tools/bin"' >> ~/.bashrc
+  source ~/.bashrc
+  curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+  curl https://packages.microsoft.com/config/ubuntu/16.04/prod.list | sudo tee /etc/apt/sources.list.d/msprod.list
+  sudo apt-get update
+  sudo ACCEPT_EULA=Y apt-get install -y mssql-tools unixodbc-dev
+  
+  ******************************************************************************************************************************
+  #RESTRINGIR O ACESSO À REDE
+    #SE CONECTAR A VM LINUX
+    ssh 13.64.145.203
+    #RESGATAR CADEIA DE CONEXÃO
+    sqlcmd -S tcp:server29429.database.windows.net,1433 -d marketplaceDb -U artur -P Sqlteste1 -N -l 30
