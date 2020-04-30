@@ -1,0 +1,14 @@
+#Adicione o pacote de armazenamento
+#Abrir CLI do Azure (cloudshell) e digitar o comando cd para acessar o diretório do aplicativo criado
+
+>cd
+
+#Adicionando pacote azure-storage ao aplicativo
+#Utilizar o comando --save para que ele seja persistido em .json
+
+>npm install azure-storage --save
+
+#após conclusão da instalação execute o aplicativo
+
+>node index.js
+
