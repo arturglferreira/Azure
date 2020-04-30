@@ -1,0 +1,7 @@
+#Conectar-se a VM
+
+>ssh 'publicIpAddress'
+
+#Conectar-se com o banco de dados com as credenciais
+
+> sqlcmd -S tcp:serverNNNN.database.windows.net,1433 -d marketplaceDb -U '[]' -P '[password]' -N -l 30
