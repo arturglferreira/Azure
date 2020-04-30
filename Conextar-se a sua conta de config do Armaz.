@@ -1,0 +1,115 @@
+#Adicionar código de conexão à conta de armazenamento do Azure, utilizando a cadeia de conexão adicionada
+#Chamar a variável AZURE_STORAGE_CONNECTION_STRING
+#Criar um cliente Blob
+
+#Acessar a tela de comando por 
+
+>code .
+
+#Abra a aba index.js e armazena o módulo em uma variável chamada 'storage'
+
+>#!/usr/bin/env node
+require('dotenv').config();
+
+>const storage = require('azure-storage
+
+#Em seguida use o objeto 'storage' para criar um objeto 'BlobService' e armazene-o em um global chamado blobservice
+
+> const blobService = storage.createBlobService();
+
+#Adicionar uma constante para o contêiner que desejamos criar
+
+const containerName = 'nome a definir';
+
+#A partir do comando <createContainerIfNoExists', que é um método para se trabalhar com APIs de armazenamento do blob
+#Adicione logo abaixo ao comando require uma constante <const> util
+
+>#!/usr/bin/env node
+require('dotenv').config();
+
+const util = require('util');
+const storage = require('azure-storage');
+const blobService = storage.createBlobService();
+const containerName = 'nome do contêiner';<
+
+#Após todas as constantes, use <util.promisify> para usar a versão de retorne de chamada de <createContainerIfNoExists'
+#e transformá-la em um método de retorno promise
+  #considerando que o método de retorno de chamada está em um objeto, adicione o método <bind> para conectá-la neste contexto
+  #Atribua o valor retornado como uma constante no ínicio do arquivo <createContainerAsync>
+  #Será necessário um <require> para o módulo <util> próximo a parte superior do arquivo
+
+>const util = require('util');
+const storage = require('azure-storage');
+const blobService = storage.createBlobService();
+const containerName = 'photoblobs';
+
+const createContainerAsync = util.promisify(blobService.createContainerIfNotExists).bind(blobService);
+
+#Chame a nova promessa <createContainerAsync>
+  #Passe a constante ContainerName
+  #Aplica a palavra 'await' a chamada
+  #Encapsule em um constructor <try / catch> e gere a saída de erro, quando houver
+
+> try {
+    await createContainerAsync(containerName);
+ 
+}
+
+#A promessa <createContainerAsync> retorna o primeiro valore de <createContainerIfNoExists>, que é o resultado do catainer
+#isso inclui informações sobre ele ter sido criado ou não
+#Capture o resultado em uma variável e gere a saída sobre o container, se ele foi ou não criado, por meio de <result.created>
+
+> try {
+    var result = await createContainerAsync(containerName);
+    if (result.created) {
+        console.log(`Blob container ${containerName} created`);
+    }
+    else {
+        console.log(`Blob container ${containerName} already exists.`);
+    }
+}
+catch (err) {
+    console.log(err.message);
+}
+catch (err) {
+    console.log(err.message);
+}
+
+#Por fim salve a função <main> com a palavra-chave 'async'
+#Salve o arquivo
+
+--------------------------------------***RESULTADO FINAL DO CÓDIGO****---------------------------------------------------------------
+#!/usr/bin/env node
+
+require('dotenv').config();
+
+const util = require('util');
+
+const storage = require('azure-storage');
+const blobService = storage.createBlobService();
+const createContainerAsync = util.promisify(blobService.createContainerIfNotExists).bind(blobService);
+
+const containerName = 'photoblobs';
+
+async function main() {
+    try {
+        var result = await createContainerAsync(containerName);
+        if (result.created) {
+            console.log(`Blob container ${containerName} created`);
+        }
+        else {
+            console.log(`Blob container ${containerName} already exists.`);
+        }
+    }
+    catch (err) {
+        console.log(err.message);
+    }
+}
+
+main();
+
+---------------------------***EXECUTAR O APLICATIVO***--------------------------------------------------------------------------------
+#Precisa estar no diretório do aplicativo
+>node index.js
+
+--------------------------***PARA EXCLUIR O APLICATIVO***---------------------------------------------------------------------------
