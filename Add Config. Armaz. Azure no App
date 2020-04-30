@@ -1,0 +1,25 @@
+#Adicionar suporte ao app Node.js para recuperar uma cadeia de conexão de um arquivo de configuração, por meio 
+da adição de detalhes técnicos necessários para gerenciar as configurações no arquivo JavaScript.
+#Acessar o diretório de trabalho correto <cd>
+#Utilizar a ferramenta touch para criar um arquivo <env.>
+#No Bash
+
+>touch .env
+
+#Acessar o editor por meio do comando
+
+>code .
+
+#No menu .env inserir o seguinte comando e depois salve-o
+
+>AZURE_STORAGE_CONNECTION_STRING=<value>
+
+#Adicionar código para leitura do arquivo de configuração
+#Ainda no editor, selecionar o painel index.js, inserir abaixo de <#!/usr/bin/env node> o comando require para carregar
+o pacote dotenv. Isso disponibilizará as variáveis de ambiente definidas no arquivo <env.>
+
+>#!/usr/bin/env node
+ require('dotenv').config();
+ // ... more code follows
+ 
+ 
