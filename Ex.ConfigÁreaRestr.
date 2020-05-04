@@ -4,7 +4,7 @@
   export PASSWORD= Sqlteste1
   # Set the logical SQL server name. We'll add a random string as it needs to be globally unique.
   export SERVERNAME=server$RANDOM
-  export RESOURCEGROUP=learn-d082fad0-7286-4679-a912-088863b798c1
+  export RESOURCEGROUP=learn-b3bb3381-b2bd-4c06-8ee6-0f03304328a2
   # Set the location, we'll pull the location from our resource group.
   export LOCATION=$(az group show --name $RESOURCEGROUP | jq -r '.location')
 
@@ -25,7 +25,7 @@
           
      #OBTER A CADEIA DE CONEXÃO PARA ESTE BANCO DE DADOS
      az sql db show-connection-string --client sqlcmd --name marketplaceDb --server $SERVERNAME | jq -r
-          #OUTPUT: sqlcmd -S tcp:server29429.database.windows.net,1433 -d marketplaceDb -U artur -P Sqlteste1 -N -l 30
+          #OUTPUT: sqlcmd -S tcp:server1666.database.windows.net,1433 -d marketplaceDb -U artur -P Sqlteste1 -N -l 30
             ****SE O OUTPUT TIVER ERRO DE ACESSO POR CONTA DO IP, É NECESSÁRIO AUTORIZÁ-LO VIA PAINEL
 *******************************************************************************************************************************
 #CRIAR E CONFIGURAR VM LINUX
@@ -37,17 +37,17 @@ az vm create \
   --generate-ssh-keys
   
       --> OUTPUT****************************************
-              {- Finished ..
-          "fqdns": "",
-          "id": "/subscriptions/e437e6a0-6238-4683-8a1a-3e7ef15124ee/resourceGroups/learn-d082fad0-7286-4679-a912-088863b798c1/providers/Microsoft.Compute/virtualMachines/appServer",
-          "location": "westus",
-          "macAddress": "00-0D-3A-33-95-7C",
-          "powerState": "VM running",
-          "privateIpAddress": "10.0.0.4",
-          "publicIpAddress": "13.64.145.203",
-          "resourceGroup": "learn-d082fad0-7286-4679-a912-088863b798c1",
-          "zones": ""
-           }
+             {- Finished ..
+            "fqdns": "",
+            "id": "/subscriptions/c1398deb-e418-4506-addf-30cab5054809/resourceGroups/learn-b3bb3381-b2bd-4c06-8ee6-0f03304328a2/providers/Microsoft.Compute/virtualMachines/appServer",
+            "location": "westus",
+            "macAddress": "00-0D-3A-5B-B6-9B",
+            "powerState": "VM running",
+            "privateIpAddress": "10.0.0.4",
+            "publicIpAddress": "40.78.13.50",
+            "resourceGroup": "learn-b3bb3381-b2bd-4c06-8ee6-0f03304328a2",
+            "zones": ""
+             }
            
  #SE CONECTAR A VM POR MEIO DO ENDEREÇO DE IP
   SSH publicIpAddress 
@@ -61,8 +61,34 @@ az vm create \
   sudo ACCEPT_EULA=Y apt-get install -y mssql-tools unixodbc-dev
   
   ******************************************************************************************************************************
-  #RESTRINGIR O ACESSO À REDE
-    #SE CONECTAR A VM LINUX
-    ssh 13.64.145.203
-    #RESGATAR CADEIA DE CONEXÃO
-    sqlcmd -S tcp:server29429.database.windows.net,1433 -d marketplaceDb -U artur -P Sqlteste1 -N -l 30
+  # Controlar quem pode acessar o banco de dados
+    #ACESSAR O BANCO 
+    sqlcmd -S tcp:server1666.database.windows.net,1433 -d marketplaceDb -U artur -P Sqlteste1 -N -l 30
+    #Criar um usuário de banco de dados
+    CREATE USER ApplicationUser WITH PASSWORD = '1@ppuser';
+    GO
+    #Conceder permissões a um usuário (adicionar como leitor e criador)
+    ALTER ROLE db_datareader ADD MEMBER ApplicationUser;
+    ALTER ROLE db_datawriter ADD MEMBER ApplicationUser;
+    GO
+      #COMANDOS PARA RESTRIÇÃO DE ACESSO AO USUÁRIO DE FUNÇÕES ESPECÍFICAS (NESTE CASO BLOQUEAREMOS ACESSO A CONSULTAS - SELECt)
+      DENY SELECT ON SalesLT.Address TO ApplicationUser;
+      GO    
+    #TESTANDO ACESSO AO USUÁRIO CRIADO
+    #FAZER LOGON COM O NOVO USUÁRIO
+    sqlcmd -S tcp:server1666.database.windows.net,1433 -d marketplaceDb -U 'ApplicationUser' -P '1@ppuser' -N -l 30
+    #EXECUTANDO TESTE NA FUNÇÃO SELECT QUE O USUÁRIO FOI BLOQUEADO
+    SELECT FirstName, LastName, EmailAddress, Phone FROM SalesLT.Customer;
+    GO 
+      #O RESULTADO DEVE SER SATISFATÓRIO POIS PARA ESTA FUNÇÃO O USUÁRIO TEM ACESSO
+    #TESTANDO ACESSO A FUNÇÃO RESTRITA À ESTE USUÁRIO
+     SELECT * FROM SalesLT.Address;
+     GO
+ ******************************************************************************************************************************
+ #PROTEGER SEUS DADOS EM TRÂNSITO
+ #ACESSAR O DB PELO PORTAL AZURE, EXECUTANDO A PESQUISA NA BARRA DE PESQUISA DO NOME DESTE BANCO
+ https://docs.microsoft.com/pt-br/learn/modules/secure-your-azure-sql-database/4-data-security 
+ *******************************************************************************************************************************
+ #MONITORAR O BANCO DE DADOS
+ 
+ 
