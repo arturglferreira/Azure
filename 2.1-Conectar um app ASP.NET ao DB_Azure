@@ -1,0 +1,39 @@
+#Configurar e implantar um app web (ele será a biblioteca)
+#Trabalharemos com um app pré-existente. Seguir as seguintes etapas
+  #Crie uma classe que contém o nome do curso, o título do módulo e a sequência de cada módulo no banco de dados.
+  #Crie uma classe de controlador de acesso a dados que recupera as informações do banco de dados.
+  #Edite o código por trás da página de índice no aplicativo Web para criar um objeto de controlador de acesso a dados e buscar os dados.
+  #Edite a página de índice para exibir os dados.  
+*****************************************************************************************************************************************
+#Implantar e executar o aplicativo Web preexistente
+  #Vá para o diretório de interesse (cd ~/'nome do diretório)
+    cd ~/education
+  #Implantar o aplicativo inicial
+    WEBAPPNAME=educationapp-$RANDOM
+    az webapp up \
+    --resource-group learn-8eac33d2-18ca-4b68-ab5f-4f662a74a0a3 \
+    --location centralus \
+    --sku F1 \
+    --name $WEBAPPNAME
+    
+    #OUTPUT
+      {
+        "URL": "http://educationapp-26150.azurewebsites.net",
+        "appserviceplan": "artur_asp_Windows_centralus_0",
+        "location": "centralus",
+        "name": "educationapp-26150",
+        "os": "Windows",
+        "resourcegroup": "learn-8eac33d2-18ca-4b68-ab5f-4f662a74a0a3",
+        "runtime_version": "dotnetcore|2.1",
+        "runtime_version_detected": "2.1",
+        "sku": "FREE",
+        "src_path": "//home//artur//education"
+      }
+    
+****************************************************************************************************************************************
+#Adicionar código ao aplicativo Web para recuperar dados
+  #Recuperar os dados do curso do banco de dados
+  #Acessar a pasta "eucation/modules"
+    cd ~/education/Models
+  #Abrir o editor do modelo
+    code CoursesAndModules.cs
