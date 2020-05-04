@@ -23,7 +23,7 @@
   #Inserir os detalhes a seguir
     #Autentificação do SQL Server
     #Logon - azuresql
-    #senha - 'especificar'
+    #senha - Azure@sql
   #No painel de consultas inserir a seguinte instrução para criação da tabela para armazenamento das informações
     CREATE TABLE Courses
     (
@@ -51,14 +51,14 @@
   #ir para a pasta correta, utilizando o comando cd, neste caso ficará: cd ~/educationdata
     cd ~/educationdata
   #Criar as variáveis que serão utilizadas nas etapas posteriores (substituir NNN pelo número usado pelo banco de dados)
-    export DATABASE_NAME=coursedatabaseNNN
-    export DATABASE_SERVER=courseserverNNN
+    export DATABASE_NAME=coursedatabase2020
+    export DATABASE_SERVER=coursedatabase2020
     export AZURE_USER=azuresql
-    export AZURE_PASSWORD=[enter your password]
+    export AZURE_PASSWORD=Azure@sql
   #Criar um arquivo de formato com base no esquema da tabela 
   #O comando (-c) código T-SQL estabele que os dados estarão no formato de caractere
   #O comando (-t,) código T-SQL estabelece que os dados serão separados por vírgula
-    bcp "$DATABASE_NAME.dbo.courses" format nul -c -f courses.fmt -t, -S "$DATABASE_SERVER.database.windows.net" -U $AZURE_USER -P    $AZURE_PASSWORD
+    bcp "$DATABASE_NAME.dbo.courses" format nul -c -f courses.fmt -t, -S "$DATABASE_SERVER.database.windows.net" -U azuresql -P 'Azure@sql'
   #Abrir o arquivo gerado pelo comando anterior com o editor de códigos
     code courses.fmt
   #Importar dados origem e transformá-los para o arquivo corrigido (.fmt). O sinalizador -F 2 direcionar o utilitário bcp para iniciar a importação de dados a partir da linha 2. A primeira linha diz respeito ao cabeçalho
