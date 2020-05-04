@@ -1,0 +1,93 @@
+#Examinar os dados delimitados por vírgula existentes
+  #No CLoud Shell, execute o comando a seguir para clonar os dados da origem
+  git clone https://github.com/MicrosoftDocs/mslearn-develop-app-that-queries-azure-sql education
+  #Movendo os dados da origem para sua própria pasta e listar os arquivos da pasta
+  mv ~/education/data ~/educationdata
+  cd ~/educationdata
+  ls
+  #Para exibir o conteudo dos arquivos, utilize o comando cat 'nome do arquivo'
+
+*************************************************************************************************************************************
+#Criar um servidor de banco de dados e um banco de dados usando o Banco de Dados SQL
+  #Entrar no portal Azure
+  #Criar recurso
+  #Banco de dados / Banco de dados SQL
+    #informar os parâmetros para criação do banco de dados
+    
+
+*************************************************************************************************************************************
+#Criar Tabelas 
+  #No menu Azure, selecionar BD SQL
+  #Selecionar o nome da 'database'
+  #Selecionar editor de consultas
+  #Inserir os detalhes a seguir
+    #Autentificação do SQL Server
+    #Logon - azuresql
+    #senha - 'especificar'
+  #No painel de consultas inserir a seguinte instrução para criação da tabela para armazenamento das informações
+    CREATE TABLE Courses
+    (
+    CourseID INT NOT NULL PRIMARY KEY,
+    CourseName VARCHAR(50) NOT NULL
+    )
+  #Criar tabela para armazenar os módulos
+    CREATE TABLE Modules
+    (
+    ModuleCode VARCHAR(5) NOT NULL PRIMARY KEY,
+    ModuleTitle VARCHAR(50) NOT NULL
+    )
+  #Criar tabela chamada 'StudyPlans'
+    CREATE TABLE StudyPlans
+    (
+    CourseID INT NOT NULL,
+    ModuleCode VARCHAR(5) NOT NULL,
+    ModuleSequence INT NOT NULL,
+    PRIMARY KEY(CourseID, ModuleCode)
+    )
+  #Na janela de banco de dados, selecione atualizar na barra de ferramentas, em seguida expanda as tabelas
+  
+***************************************************************************************************************************************
+#Importar os Dados
+  #ir para a pasta correta, utilizando o comando cd, neste caso ficará: cd ~/educationdata
+    cd ~/educationdata
+  #Criar as variáveis que serão utilizadas nas etapas posteriores (substituir NNN pelo número usado pelo banco de dados)
+    export DATABASE_NAME=coursedatabaseNNN
+    export DATABASE_SERVER=courseserverNNN
+    export AZURE_USER=azuresql
+    export AZURE_PASSWORD=[enter your password]
+  #Criar um arquivo de formato com base no esquema da tabela 
+  #O comando (-c) código T-SQL estabele que os dados estarão no formato de caractere
+  #O comando (-t,) código T-SQL estabelece que os dados serão separados por vírgula
+    bcp "$DATABASE_NAME.dbo.courses" format nul -c -f courses.fmt -t, -S "$DATABASE_SERVER.database.windows.net" -U $AZURE_USER -P    $AZURE_PASSWORD
+  #Abrir o arquivo gerado pelo comando anterior com o editor de códigos
+    code courses.fmt
+  #Importar dados origem e transformá-los para o arquivo corrigido (.fmt). O sinalizador -F 2 direcionar o utilitário bcp para iniciar a importação de dados a partir da linha 2. A primeira linha diz respeito ao cabeçalho
+    bcp "$DATABASE_NAME.dbo.courses" in courses.csv -f courses.fmt -S "$DATABASE_SERVER.database.windows.net" -U $AZURE_USER -P $AZURE_PASSWORD -F 2
+  #Importar os dados para a tabela modules "dbo.modules" do arquivo "modules.csv"
+  #Repetir o processo de gerar arquivo de formato e importação dos dados csv para modules conforme necessidade e existência de planilhas
+    #Gerar um arquivo de formato
+      bcp "$DATABASE_NAME.dbo.modules" format nul -c -f modules.fmt -t, -S "$DATABASE_SERVER.database.windows.net" -U $AZURE_USER -P $AZURE_PASSWORD
+    #importar os dados arquivo "modules.csv" para tabela "modules" do banco de dados
+
+***************************************************************************************************************************************
+#Consultar os dados no banco de dados
+  #Retornar ao portal Azure
+  #Selecionar banco de dados SQL , no database em questão
+  #clicar em visão geral, selecionar editor de consultas
+  #Inserir os seguintes detalhes
+      #Autentificação do SQL Server
+      #Logon - azuresql
+      #senha - 'especificar'
+  #No painel de consultas 1, inserir a seguinte instruçã
+    SELECT * FROM dbo.Courses
+  #Alterar o código de pesquisa para módulos, na janela resultados deverá ver 16 linhas
+    SELECT * FROM dbo.Modules
+  #Voltar para linha de comando CloudShell e inserir o seguinte comando para se conectá-lo
+    sqlcmd -S "$DATABASE_SERVER.database.windows.net" -d "$DATABASE_NAME" -U $AZURE_USER -P $AZURE_PASSWORD
+  #No pronpt >1 inserir o seguinte comando para buscar os dados (deverá retornar 45 linhas)
+    SELECT * FROM StudyPlans;  
+    GO
+  #Sair do banco através da função exit
+ 
+  
+  
