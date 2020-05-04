@@ -1,0 +1,58 @@
+#Create a Service Principal
+  az ad sp create-for-rbac --name miidasappvhsys
+#If you forgot authetication information, you may retrieve at any point by 
+  az ad sp list --display-name "nome do aplicativo"
+  
+  --> OUTPUT:
+      {
+        "appId": "b8649c2c-184c-49c2-aa90-d332c340556a",
+        "displayName": "miidasappvhsys",
+        "name": "http://miidasappvhsys",
+        "password": "553e96ea-7df6-43f6-a0c5-b5b317c7cd7e",
+        "tenant": "304bda76-72df-4a3d-8a24-16b9219940d4"
+      }
+***************************************************************************************************************************************
+#Create a role as reader or contributor
+  az role assignment create --assignee b8649c2c-184c-49c2-aa90-d332c340556a --role Reader
+  az role assignment delete --assignee APP_ID --role Contributor
+  
+  #Adding a permission, When restricting a service principal's permissions, the Contributor role should be removed.
+  #To check the listing of the assined roles
+    az role assignment list --assignee b8649c2c-184c-49c2-aa90-d332c340556a
+    
+**************************************************************************************************************************************
+#Sign in using a service principal
+#To test principal's credentials
+  //synthax:az login --service-principal --username $APP_ID --password $PASSWORD --tenant $TENANT_ID//
+  az login --service-principal --username "b8649c2c-184c-49c2-aa90-d332c340556a" --password "553e96ea-7df6-43f6-a0c5-b5b317c7cd7e" --tenant "304bda76-72df-4a3d-8a24-16b9219940d4"
+  
+  -->OUTPUT
+     [
+          {
+            "cloudName": "AzureCloud",
+            "homeTenantId": "304bda76-72df-4a3d-8a24-16b9219940d4",
+            "id": "854c60eb-ebb8-49df-9423-05afe2babacd",
+            "isDefault": true,
+            "managedByTenants": [],
+            "name": "Avaliação Gratuita",
+            "state": "Enabled",
+            "tenantId": "304bda76-72df-4a3d-8a24-16b9219940d4",
+            "user": {
+              "name": "b8649c2c-184c-49c2-aa90-d332c340556a",
+              "type": "servicePrincipal"
+            }
+          }
+    ] 
+
+**************************************************************************************************************************************
+#To Reset Credentialçs
+  az ad sp credential reset --name APP_ID
+  
+**************************************************************************************************************************************
+
+
+
+#Request the Access Token
+   curl -X POST -d 'grant_type=client_credentials&client_id=[APP_ID]&client_secret=[PASSWORD]&resource=https%3A%2F%2Fmanagement.azure.com%2F' https://login.microsoftonline.com/[TENANT_ID]/oauth2/token
+   
+   
